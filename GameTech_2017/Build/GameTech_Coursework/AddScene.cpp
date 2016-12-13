@@ -9,6 +9,7 @@
 #include <ncltech\SphereCollisionShape.h>
 #include <ncltech\CuboidCollisionShape.h>
 #include <ncltech\NCLDebug.h>
+#include <algorithm>
 
 using namespace CommonUtils;
 
@@ -412,7 +413,7 @@ void EmptyScene::OnUpdateScene(float dt) {
 	{
 		thispoints = (int)PhysicsEngine::Instance()->GetPoints();
 		totalpoints += thispoints;
-		setstateifcollision(true);
+		//setstateifcollision(true);
 		
 	}
 	else if (PhysicsEngine::Instance()->GetPoints() == -1)
@@ -422,14 +423,21 @@ void EmptyScene::OnUpdateScene(float dt) {
 	}
 
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_0)) {
+	
+		savescore.push_back(totalpoints);
+		compernumber();
 		thispoints = 0;
 		totalpoints = 0;
+
+		
+
 		
 	}
 
 	NCLDebug::AddStatusEntry(status_colour, "This  Score is: %d", thispoints);
 	NCLDebug::AddStatusEntry(status_colour, "Total  Score is: %d", totalpoints);
 	
+
 	//NCLDebug::AddStatusEntry(status_colour, "Score: %d", s);
 	
 	
@@ -485,23 +493,25 @@ void EmptyScene::OnUpdateScene(float dt) {
 	if (target->Physics()->Getcolition() == true && PhysicsEngine::Instance()->GetPoints() > 0)
 	{
 		state_if_collision=true;
-		
+		//EmptyScene::setstateifcollision(true);
 	}
 	else
 	{
 		state_if_collision=false;
+		//EmptyScene::setstateifcollision(false);
 	}
 	if (target != NULL) {
 		target->Physics()->SetAngularVelocity(Vector3(0.f, 0.5f, 0.f));
 		target->Physics()->Settarget(true);
 	}
-	if (state_if_collision == true) {
+	if (state_if_collision== true) {
 		char* text_data = "you got score!";
 
 		ENetPacket* packet = enet_packet_create(text_data, strlen(text_data) + 1, 0);
 
 		enet_peer_send(m_pServerConnection, 0, packet);
 	}
+	
 }
 
 void EmptyScene::ProcessNetworkEvent(const ENetEvent& evnt)
@@ -557,7 +567,25 @@ void EmptyScene::ProcessNetworkEvent(const ENetEvent& evnt)
 	case ENET_EVENT_TYPE_DISCONNECT:
 	{
 		NCLDebug::Log("Network: Server has disconnected!");
+
+		
+
 	}
 	break;
 	}
+}
+
+void EmptyScene::compernumber() {
+	std::sort(savescore.begin(),savescore.end(),std::greater<int>());
+	ostringstream f;
+	for(std::vector<int>::iterator it = savescore.begin(); it != savescore.end(); ++it)
+	{
+		f << " " << *it;
+	}
+	//const char a=f.str().c_str();
+	const char* text_data1 = f.str().c_str();
+
+	ENetPacket* packet = enet_packet_create(text_data1, strlen(text_data1) + 1, 0);
+
+	enet_peer_send(m_pServerConnection, 0, packet);
 }

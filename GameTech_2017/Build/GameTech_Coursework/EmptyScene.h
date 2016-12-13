@@ -5,6 +5,7 @@
 #include <ncltech\CommonUtils.h>
 #include <nclgl\OBJMesh.h>
 #include <ncltech\NetworkBase.h>
+#include	<vector>
 
 class EmptyScene : public Scene
 {
@@ -19,11 +20,14 @@ public:
 	void ProcessNetworkEvent(const ENetEvent& evnt);
 
 	bool m_Rotating;
+	void compernumber();
 	
-	virtual void setstateifcollision(bool a) { state_if_collision = a; }
-	virtual bool getstateifcollision() { return state_if_collision; }
+	void setstateifcollision(bool a) { state_if_collision = a; }
+	bool getstateifcollision() { return state_if_collision; }
 
 protected:
+
+	vector<int>	savescore;
 	float m_AccumTime;
 	Object* m_pPlayer;
 
