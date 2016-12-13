@@ -55,6 +55,7 @@ public:
 	inline bool					Getcolition()				const	{ return m_colltion; }
 	inline bool					Gettarget()					const	{ return m_target; }
 	inline bool					Getbullet()					const	{ return m_bullet; }
+	inline bool					Getaddpoints()				const	{ return m_addpoints; }
 
 	inline float				GetElasticity()				const 	{ return m_Elasticity; }
 	inline float				GetFriction()				const 	{ return m_Friction; }
@@ -121,6 +122,7 @@ protected:
 	bool				m_colltion;
 	bool				m_target;
 	bool				m_bullet;
+	bool				m_addpoints;
 
 	mutable bool		m_wsTransformInvalidated;
 	mutable Matrix4		m_wsTransform;

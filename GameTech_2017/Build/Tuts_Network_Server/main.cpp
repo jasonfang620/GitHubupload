@@ -118,15 +118,15 @@ int main(int arcg, char** argv)
 			// - At the moment this is just a position update that rotates around the origin of the world
 			//   though this can be any variable, structure or class you wish. Just remember that everything 
 			//   you send takes up valuable network bandwidth so no sending every PhysicsObject struct each frame ;)
-			accum_time = 0.0f;
-			Vector3 pos = Vector3(
-				cos(rotation) * 2.0f,
-				1.5f,
-				sin(rotation) * 2.0f);
+			//accum_time = 0.0f;
+			//Vector3 pos = Vector3(
+			//	cos(rotation) * 2.0f,
+			//	1.5f,
+			//	sin(rotation) * 2.0f);
 
-			//Create the packet and broadcast it (unreliable transport) to all clients
-			ENetPacket* position_update = enet_packet_create(&pos, sizeof(Vector3), 0);
-			enet_host_broadcast(server.m_pNetwork, 0, position_update);
+			////Create the packet and broadcast it (unreliable transport) to all clients
+			//ENetPacket* position_update = enet_packet_create(&pos, sizeof(Vector3), 0);
+			//enet_host_broadcast(server.m_pNetwork, 0, position_update);
 		}
 
 		Sleep(0);

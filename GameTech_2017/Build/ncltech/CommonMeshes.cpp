@@ -60,7 +60,7 @@ void CommonMeshes::InitializeMeshes()
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 
-		m_pPlane = Mesh::GenerateQuadTexCoordCol(Vector2(1.f, 1.f), Vector2(0.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+		m_pPlane = Mesh::GenerateQuadTexCoordCol(Vector2(2.f, 2.f), Vector2(0.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 		m_pCube = new OBJMesh(MESHDIR"cube.obj");
 		m_pCube_groud = new OBJMesh(MESHDIR"cube.obj");
 		m_pSphere = new OBJMesh(MESHDIR"sphere.obj");

@@ -353,27 +353,34 @@ void PhysicsEngine::NarrowPhaseCollisions()
 
 					Vector3 t1= cp.pObjectA->GetPosition();
 					Vector3 t2=	cp.pObjectB->GetPosition();
-					if(cp.pObjectA->Getbullet()&&cp.pObjectB->Gettarget()&&cp.pObjectA->m_colltion==false){
+					if(cp.pObjectA->Getbullet()&&cp.pObjectB->Gettarget() && cp.pObjectA->m_addpoints == false){
 						Vector3 v = t1 - t2;
 						float score = v.LengthSquared();
 						if (score <= 25.0f)
-							points = 100.0f +(-20.0f)*score;
-						
-						cp.pObjectA->m_colltion = true;
+							points = 100.f*(1.f/score);
+						else
+						{
+							points = -1;
+						}
+						cp.pObjectA->m_addpoints = true;
 					}
-					else if(cp.pObjectB->Getbullet()&&cp.pObjectA->Gettarget()&&cp.pObjectB->m_colltion==false)
+					else if(cp.pObjectB->Getbullet()&&cp.pObjectA->Gettarget() && cp.pObjectB->m_addpoints == false)
 					{
 						Vector3 v = t1 - t2;
 						float score = v.LengthSquared();
 						if (score <= 25.0f)
 						{
 
-							points = 100.0f + (-20.0f)*score;
+							points = 100.f*(1.f / score);
 						}
-						
-						cp.pObjectB->m_colltion = true;
+						else
+						{
+							points = -1;
+						}
+						cp.pObjectB->m_addpoints = true;
 					}
-					
+					cp.pObjectA->m_colltion = true;
+					cp.pObjectB->m_colltion = true;
 
 					//-- TUTORIAL 5 CODE --
 					// Build full collision manifold that will also handle the collision response between the two objects in the solver stage

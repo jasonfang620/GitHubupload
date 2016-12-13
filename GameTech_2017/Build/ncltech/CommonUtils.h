@@ -66,4 +66,14 @@ namespace CommonUtils
 		bool dragable,
 		const Vector4& color);
 
+	Object* BuildPlantObject(
+		const std::string& name,
+		const Vector3& pos,
+		const Vector3& halfdims,
+		bool physics_enabled,
+		float inverse_mass,
+		bool collidable,
+		bool dragable,
+		const Vector4& color);
+
 };

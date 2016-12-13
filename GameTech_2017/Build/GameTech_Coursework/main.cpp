@@ -1,11 +1,12 @@
+#include <enet/enet.h>
 #include <nclgl\Window.h>
 #include <ncltech\PhysicsEngine.h>
 #include <ncltech\SceneManager.h>
 #include <ncltech\NCLDebug.h>
 #include <ncltech\PerfTimer.h>
-
 #include "TestScene.h"
 #include "EmptyScene.h"
+
 
 const Vector4 status_colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 const Vector4 status_colour_header = Vector4(0.8f, 0.9f, 1.0f, 1.0f);
@@ -14,8 +15,11 @@ bool show_perf_metrics = false;
 PerfTimer timer_total, timer_physics, timer_update, timer_render;
 uint shadowCycleKey = 4;
 
-int thispoints;
-int totalpoints;
+
+
+
+//int thispoints=0;
+//int totalpoints=0;
 
 // Program Deconstructor
 //  - Releases all global components and memory
@@ -25,6 +29,7 @@ void Quit(bool error = false, const string &reason = "") {
 	//Release Singletons
 	SceneManager::Release();
 	PhysicsEngine::Release();
+	enet_deinitialize();  //!!!NEW!!!!!
 	Window::Destroy();
 
 	//Show console reason before exit
@@ -44,6 +49,12 @@ void Initialize()
 	//Initialise the Window
 	if (!Window::Initialise("Game Technologies", 1280, 800, false))
 		Quit(true, "Window failed to initialise!");
+
+	//Initialise ENET for networking  //!!!NEW!!!!!
+	if (enet_initialize() != 0)
+	{
+		Quit(true, "ENET failed to initialize!");
+	}
 
 	//Initialise the PhysicsEngine
 	PhysicsEngine::Instance();
@@ -90,8 +101,8 @@ void PrintStatusEntries()
 	}
 	NCLDebug::AddStatusEntry(status_colour, "");
 
-	NCLDebug::AddStatusEntry(status_colour, "This  Score is: %d", thispoints);
-	NCLDebug::AddStatusEntry(status_colour, "Total  Score is: %d", totalpoints);
+	/*NCLDebug::AddStatusEntry(status_colour, "This  Score is: %d", thispoints);
+	NCLDebug::AddStatusEntry(status_colour, "Total  Score is: %d", totalpoints);*/
 }
 
 
@@ -110,12 +121,16 @@ void HandleKeyboardInputs()
 	uint sceneIdx = SceneManager::Instance()->GetCurrentSceneIndex();
 	uint sceneMax = SceneManager::Instance()->SceneCount();
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_E))
+		
 		SceneManager::Instance()->JumpToScene((sceneIdx + 1) % sceneMax);
 
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_Q))
+		
 		SceneManager::Instance()->JumpToScene((sceneIdx == 0 ? sceneMax : sceneIdx) - 1);
+	
 
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_R))
+		
 		SceneManager::Instance()->JumpToScene(sceneIdx);
 
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_G))
@@ -132,7 +147,7 @@ int main()
 	Window::GetWindow().GetTimer()->GetTimedMS();
 
 	//Create main game-loop
-	while (Window::GetWindow().UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)) {
+	while (Window::GetWindow().UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_X)) {
 		//Start Timing
 		float dt = Window::GetWindow().GetTimer()->GetTimedMS() * 0.001f;	//How many milliseconds since last update?
 		timer_total.BeginTimingSection();
@@ -158,14 +173,25 @@ int main()
 		timer_physics.BeginTimingSection();
 		PhysicsEngine::Instance()->Update(dt);
 		timer_physics.EndTimingSection();
-
-		if (PhysicsEngine::Instance()->GetPoints() > 0)
-		{
-			thispoints = PhysicsEngine::Instance()->GetPoints();
-			totalpoints += thispoints;
-		}
 		
 
+
+		/*if (PhysicsEngine::Instance()->GetPoints() > 0)
+		{
+			thispoints = (int)PhysicsEngine::Instance()->GetPoints();
+			totalpoints += thispoints;
+			
+		}
+		else if (PhysicsEngine::Instance()->GetPoints() == -1)
+		{
+			thispoints = 0;
+		}
+
+		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_0)) {
+			thispoints = 0;
+			totalpoints = 0;
+		}*/
+		
 		//Render Scene
 		timer_render.BeginTimingSection();
 		SceneManager::Instance()->RenderScene();
@@ -180,8 +206,14 @@ int main()
 		//Finish Timing
 		timer_total.EndTimingSection();
 
+
+
+
 		//Let other programs on the computer have some CPU time
 		Sleep(0);
+
+
+
 	}
 
 	//Cleanup

@@ -20,6 +20,7 @@ PhysicsObject::PhysicsObject()
 	, m_state(false)		//	initializate phycis
 	, m_target(false)		//	initializate target
 	, m_bullet(false)		//	initializate bullet
+	,m_addpoints(false)		//	initializate addpoints
 {
 }
 
