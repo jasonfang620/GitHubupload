@@ -39,9 +39,11 @@ FOR MORE NETWORKING INFORMATION SEE "Tuts_Network_Client -> Net1_Client.h"
 #include <nclgl\Vector3.h>
 #include <nclgl\common.h>
 #include <ncltech\NetworkBase.h>
-
+#include <vector>
 //Needed to get computer adapter IPv4 addresses via windows
 #include <iphlpapi.h>
+#include <sstream>
+#include <algorithm>
 #pragma comment(lib, "IPHLPAPI.lib")
 
 
@@ -53,8 +55,26 @@ GameTimer timer;
 float accum_time = 0.0f;
 float rotation = 0.0f;
 
+int	savescore[10];
 
 void Win32_PrintAllAdapterIPAddresses();
+void insertRankArr(int n)
+{
+	for (int i = 0; i < 10; i++)
+	{
+		if (n > savescore[i])
+		{
+			for (int j = 9; j > i; j--)
+			{
+				savescore[j] = savescore[j - 1];
+			}
+			savescore[i] = n;
+			break;
+		}
+	}
+}
+
+
 
 int onExit(int exitcode)
 {
@@ -100,10 +120,35 @@ int main(int arcg, char** argv)
 				break;
 
 			case ENET_EVENT_TYPE_RECEIVE:
+			{
 				printf("\t Client %d says: %s\n", evnt.peer->incomingPeerID, evnt.packet->data);
+				/*savescore.push_back((int)*evnt.packet->data);
+				std::sort(savescore.begin(), savescore.end(), std::greater<int>());*/
+				
+				
+
+
+				/*if (savescore.size() > 0)
+				{*/
+					//ENetPacket* position_update = enet_packet_create(&savescore[0], savescore.size() * sizeof(int), 0);
+
+					//ENetPacket* position_update = enet_packet_create(text_data, strlen(text_data) + 1, 0);
+					//enet_host_broadcast(server.m_pNetwork, 0, position_update);
+			/*	}*/
+				std::string str((char *)evnt.packet->data);
+				int shotPoint = std::stoi(str);
+				insertRankArr(shotPoint);
+
+
+				ENetPacket* position_update = enet_packet_create(
+					savescore, 10 * sizeof(int), 0
+					);
+				enet_host_broadcast(server.m_pNetwork, 0, position_update);
+
+
 				enet_packet_destroy(evnt.packet);
 				break;
-
+			}
 			case ENET_EVENT_TYPE_DISCONNECT:
 				printf("- Client %d has disconnected.\n", evnt.peer->incomingPeerID);
 				break;
@@ -118,15 +163,24 @@ int main(int arcg, char** argv)
 			// - At the moment this is just a position update that rotates around the origin of the world
 			//   though this can be any variable, structure or class you wish. Just remember that everything 
 			//   you send takes up valuable network bandwidth so no sending every PhysicsObject struct each frame ;)
-			//accum_time = 0.0f;
+			accum_time = 0.0f;
 			//Vector3 pos = Vector3(
 			//	cos(rotation) * 2.0f,
 			//	1.5f,
 			//	sin(rotation) * 2.0f);
-
+			/*std::stringstream f;
+			for (std::vector<int>::iterator it = savescore.begin(); it != savescore.end(); ++it) {
+				f << "HELLO!" << *it;
+			}
+			const char* text_data = f.str().c_str();*/
 			////Create the packet and broadcast it (unreliable transport) to all clients
-			//ENetPacket* position_update = enet_packet_create(&pos, sizeof(Vector3), 0);
-			//enet_host_broadcast(server.m_pNetwork, 0, position_update);
+			//if (savescore.size() > 0)
+			//{
+			//	ENetPacket* position_update = enet_packet_create(&savescore[0], savescore.size() * sizeof(int), 0);
+
+			//	//ENetPacket* position_update = enet_packet_create(text_data, strlen(text_data) + 1, 0);
+			//	enet_host_broadcast(server.m_pNetwork, 0, position_update);
+			//}
 		}
 
 		Sleep(0);

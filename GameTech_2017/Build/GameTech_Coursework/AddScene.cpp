@@ -11,7 +11,28 @@
 #include <ncltech\NCLDebug.h>
 #include <algorithm>
 
+
 using namespace CommonUtils;
+
+//enum Packet_Type
+//{
+//	PACKET_TYPE_TEXT = 0,
+//	PACKET_TYPE_HIGHSCORE = 1
+//};
+//struct PacketHighscores
+//{
+//	Packet_Type type = PACKET_TYPE_HIGHSCORE;
+//	int highscores[10];
+//	int num_highscores;
+//};
+//
+//struct PacketText
+//{
+//	Packet_Type type = PACKET_TYPE_TEXT;
+//	char* string_text;
+//};
+
+
 
 
 const Vector4 status_colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -414,6 +435,8 @@ void EmptyScene::OnUpdateScene(float dt) {
 		thispoints = (int)PhysicsEngine::Instance()->GetPoints();
 		totalpoints += thispoints;
 		//setstateifcollision(true);
+
+	
 		
 	}
 	else if (PhysicsEngine::Instance()->GetPoints() == -1)
@@ -423,17 +446,24 @@ void EmptyScene::OnUpdateScene(float dt) {
 	}
 
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_0)) {
-	
-		savescore.push_back(totalpoints);
-		compernumber();
+		
+		/*savescore.push_back(totalpoints);*/
+		/*compernumber();*/
 		thispoints = 0;
 		totalpoints = 0;
 
-		
-
-		
 	}
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_9)) {
+		
+		ostringstream f;
+		f << totalpoints;
+		
+		ENetPacket* packet = enet_packet_create(f.str().c_str(), strlen(f.str().c_str()) + 1, 0);
 
+		enet_peer_send(m_pServerConnection, 0, packet);
+	}
+	NCLDebug::AddStatusEntry(status_colour, "Plz press 9 button to send your total to server");
+	NCLDebug::AddStatusEntry(status_colour, "Plz press 0 button to reset your score");
 	NCLDebug::AddStatusEntry(status_colour, "This  Score is: %d", thispoints);
 	NCLDebug::AddStatusEntry(status_colour, "Total  Score is: %d", totalpoints);
 	
@@ -456,17 +486,7 @@ void EmptyScene::OnUpdateScene(float dt) {
 
 	PhysicsEngine::Instance()->SetDebugDrawFlags(drawFlags);
 
-	//target12 = this->FindGameObject("target");
-
-	/*if (target12->Physics()->Getcolition() == true && PhysicsEngine::Instance()->GetPoints() > 0 || PhysicsEngine::Instance()->GetPoints() == -1)
-	{
-		setstateifcollision(true);
-	}
-	else
-	{
-		setstateifcollision(false);
-	}*/
-
+	
 	//Update Network
 	auto callback = std::bind(
 		&EmptyScene::ProcessNetworkEvent,	// Function to call
@@ -474,8 +494,6 @@ void EmptyScene::OnUpdateScene(float dt) {
 		std::placeholders::_1);				// Where to place the first parameter
 	m_Network.ServiceNetwork(dt, callback);
 
-
-	
 
 	//Add Debug Information to screen
 	uint8_t ip1 = m_pServerConnection->address.host & 0xFF;
@@ -493,24 +511,24 @@ void EmptyScene::OnUpdateScene(float dt) {
 	if (target->Physics()->Getcolition() == true && PhysicsEngine::Instance()->GetPoints() > 0)
 	{
 		state_if_collision=true;
-		//EmptyScene::setstateifcollision(true);
 	}
 	else
 	{
 		state_if_collision=false;
-		//EmptyScene::setstateifcollision(false);
 	}
 	if (target != NULL) {
 		target->Physics()->SetAngularVelocity(Vector3(0.f, 0.5f, 0.f));
 		target->Physics()->Settarget(true);
 	}
-	if (state_if_collision== true) {
+	/*if (state_if_collision== true) {
+		
+
 		char* text_data = "you got score!";
 
 		ENetPacket* packet = enet_packet_create(text_data, strlen(text_data) + 1, 0);
 
 		enet_peer_send(m_pServerConnection, 0, packet);
-	}
+	}*/
 	
 }
 
@@ -531,11 +549,11 @@ void EmptyScene::ProcessNetworkEvent(const ENetEvent& evnt)
 			NCLDebug::Log("Network: Successfully connected to server!");
 
 			//Send a 'hello' packet
-			char* text_data = "Hello!";
+			/*char* text_data = "Hello!";
 			
 			ENetPacket* packet = enet_packet_create(text_data, strlen(text_data) + 1, 0);
 			
-			enet_peer_send(m_pServerConnection, 0, packet);
+			enet_peer_send(m_pServerConnection, 0, packet);*/
 			
 			
 		
@@ -547,17 +565,29 @@ void EmptyScene::ProcessNetworkEvent(const ENetEvent& evnt)
 	//Server has sent us a new packet
 	case ENET_EVENT_TYPE_RECEIVE:
 	{
-		if (evnt.packet->dataLength == sizeof(Vector3))
-		{
-			Vector3 pos;
+		/*if (evnt.packet->dataLength == )
+		{*/
+			/*Vector3 pos;
 			memcpy(&pos, evnt.packet->data, sizeof(Vector3));
-			m_pObj->Physics()->SetPosition(pos);
+			m_pObj->Physics()->SetPosition(pos);*/
 
-		}
-		else
-		{
-			NCLERROR("Recieved Invalid Network Packet!");
-		}
+		/*}*/
+
+		/*else
+		{*/
+			/*NCLERROR("Recieved Invalid Network Packet!");*/
+		/*}*/
+		int* all_ints = reinterpret_cast<int*>(evnt.packet->data);
+		int num_ints = evnt.packet->dataLength / sizeof(int);
+		
+		printf("HighScores\n-----------------\n");
+
+		for (int i = 0; i < num_ints; ++i)
+			printf("\t %d\n", all_ints[i]);
+		
+		printf("\n");
+
+		//printf("HighScores\n-----------------\n%s\n", evnt.packet->data);
 
 	}
 	break;
@@ -573,19 +603,4 @@ void EmptyScene::ProcessNetworkEvent(const ENetEvent& evnt)
 	}
 	break;
 	}
-}
-
-void EmptyScene::compernumber() {
-	std::sort(savescore.begin(),savescore.end(),std::greater<int>());
-	ostringstream f;
-	for(std::vector<int>::iterator it = savescore.begin(); it != savescore.end(); ++it)
-	{
-		f << " " << *it;
-	}
-	//const char a=f.str().c_str();
-	const char* text_data1 = f.str().c_str();
-
-	ENetPacket* packet = enet_packet_create(text_data1, strlen(text_data1) + 1, 0);
-
-	enet_peer_send(m_pServerConnection, 0, packet);
 }

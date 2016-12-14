@@ -20,11 +20,11 @@ public:
 	void ProcessNetworkEvent(const ENetEvent& evnt);
 
 	bool m_Rotating;
-	void compernumber();
+	
 	
 	void setstateifcollision(bool a) { state_if_collision = a; }
 	bool getstateifcollision() { return state_if_collision; }
-
+	
 protected:
 
 	vector<int>	savescore;

@@ -1,4 +1,4 @@
-﻿Build started 13/12/2016 20:27:21.
+﻿Build started 14/12/2016 17:57:20.
      1>Project "E:\Project\GameTech_2017\Build\GameTech_Coursework\GameTech_Coursework.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Release\\" /Fd"Release\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt AddScene.cpp
@@ -8,13 +8,13 @@
          Release\main.obj
          Release\TestScene.obj
          Generating code
-         0 of 3566 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+         1 of 3539 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
            0 functions were new in current compilation
-           0 functions had inline decision re-evaluated but remain unchanged
+           3 functions had inline decision re-evaluated but remain unchanged
          Finished generating code
          GameTech_Coursework.vcxproj -> E:\Project\GameTech_2017\Build\Release\GameTech_Coursework.exe
      1>Done Building Project "E:\Project\GameTech_2017\Build\GameTech_Coursework\GameTech_Coursework.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:02.94
+Time Elapsed 00:00:02.09
