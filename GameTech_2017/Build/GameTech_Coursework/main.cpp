@@ -112,6 +112,12 @@ void PrintStatusEntries()
 //    cycling through scenes.
 void HandleKeyboardInputs()
 {
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_Z))
+		PhysicsEngine::Instance()->SetIsAtmosphere(!PhysicsEngine::Instance()->IsAtmosphere());
+
+	/*if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_M))
+		PhysicsEngine::Instance()->SetVisableState(!PhysicsEngine::Instance()->IsVisableState());*/
+
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_P))
 		PhysicsEngine::Instance()->SetPaused(!PhysicsEngine::Instance()->IsPaused());
 

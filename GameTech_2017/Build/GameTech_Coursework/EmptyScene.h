@@ -49,4 +49,6 @@ protected:
 	int thispoints = 0;
 	int totalpoints = 0;
 
+	unsigned	drawMode;
+	bool		DrawModeChanged;
 };

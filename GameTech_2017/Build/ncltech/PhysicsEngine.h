@@ -90,8 +90,11 @@ public:
 	
 	//Debug draw all physics objects, manifolds and constraints
 	void DebugRender();
+	bool IsAtmosphere()				const { return m_atmosphere; }	//get open atmosphere
+	void SetIsAtmosphere(bool a) { m_atmosphere = a; }	//open set atmosphere
 
-
+	bool IsVisableState()			const { return m_IsVisableState;} //get open VisableState
+	void SetVisableState(bool a) { m_IsVisableState = a; } //open setVisableState
 
 	//Getters / Setters 
 	bool IsPaused()						{ return m_IsPaused; }
@@ -137,7 +140,9 @@ protected:
 
 	Vector3		m_Gravity;
 	float		m_DampingFactor;
+	bool		m_atmosphere;
 
+	bool		m_IsVisableState;
 
 	std::vector<CollisionPair> m_BroadphaseCollisionPairs;
 
@@ -147,4 +152,6 @@ protected:
 	std::vector<Manifold*>		m_vpManifolds;			// Contact constraints between pairs of objects
 
 	float points;										// calculate points
+
+	
 };

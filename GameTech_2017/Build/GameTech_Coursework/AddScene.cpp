@@ -32,17 +32,15 @@ using namespace CommonUtils;
 //	char* string_text;
 //};
 
-
-
-
 const Vector4 status_colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
 EmptyScene::EmptyScene(const std::string& friendly_name)
 	: Scene(friendly_name)
 	, m_AccumTime(0.0f)
 	, m_pPlayer(NULL), m_Rotating(true),m_MeshHouse(NULL), m_pServerConnection(NULL)
-	, m_pObj(NULL)
+	, m_pObj(NULL), drawMode(0), DrawModeChanged(false)
 {
+	
 	m_MeshHouse = new OBJMesh(MESHDIR"house.obj");
 	glGenTextures(1, &m_whiteTexture);
 	glBindTexture(GL_TEXTURE_2D, m_whiteTexture);
@@ -75,12 +73,12 @@ void EmptyScene::OnInitializeScene() {
 		NCLDebug::Log("Network: Initialized!");
 
 		//Attempt to connect to the server on localhost:1234
-		m_pServerConnection = m_Network.ConnectPeer(127, 0, 0, 1, 1234);
+		m_pServerConnection = m_Network.ConnectPeer(127,0,0,1,1234);
 		NCLDebug::Log("Network: Attempting to connect to server.");
 	}
 
 
-	//PhysicsEngine::Instance()->SetPaused(false);
+	PhysicsEngine::Instance()->SetPaused(false);
 	PhysicsEngine::Instance()->SetDebugDrawFlags(DEBUGDRAW_FLAGS_COLLISIONNORMALS | DEBUGDRAW_FLAGS_COLLISIONVOLUMES);
 	SceneManager::Instance()->GetCamera()->SetPosition(Vector3(40.0f, 10.0f, 40.0f));
 	SceneManager::Instance()->GetCamera()->SetYaw(45.f);
@@ -192,111 +190,97 @@ void EmptyScene::OnInitializeScene() {
 
 	}
 
+		//balls tower
+		int balls_num = 0;
 
-	//m_pObj = CommonUtils::BuildCuboidObject(
-	//	"Server",
-	//	Vector3(0.0f, 0.0f, 25.0f),
-	//	Vector3(0.5f, 0.5f, 0.5f),
-	//	true,									//Physics Enabled here Purely to make setting position easier via Physics()->SetPosition()
-	//	0.0f,
-	//	false,
-	//	false,
-	//	Vector4(0.2f, 0.5f, 1.0f, 1.0f));
-	//this->AddGameObject(m_pObj);
-
-
-
-	//balls tower
-	int balls_num = 0;
-
-	ostringstream balls_name;
-	for (int i = 0; i < 3; ++i)
-	{
-		for (int j = 0;j < 3;++j)
+		ostringstream balls_name;
+		for (int i = 0; i < 3; ++i)
 		{
-			
-			Vector4 colour = CommonUtils::GenColour(0.7f + i * 0.05f, 1.0f);
-			balls_name << "ballname" << balls_num;
+			for (int j = 0;j < 3;++j)
+			{
 
-			Object* obj = CommonUtils::BuildSphereObject(
-				balls_name.str().c_str(),
-				Vector3(-50.0f + i * 1.25f, j*1.25f +5.5f, 6.0f),
-				0.5f,
-				true,
-				1.0f,
-				true,
-				false,
-				colour);
-			obj->Physics()->SetFriction(0.1f);
-			obj->Physics()->SetElasticity(i * 0.1f + 0.5f);
-			this->AddGameObject(obj);
-			Object* balltower = this->FindGameObject(balls_name.str().c_str());
-			balltower->Physics()->Setstate(true);
-			
-		}
-	}
-	
-	//cube tower
-	int box_num = 0;
+				Vector4 colour = CommonUtils::GenColour(0.7f + i * 0.05f, 1.0f);
+				balls_name << "ballname" << balls_num;
 
-	ostringstream box_name;
+				Object* obj = CommonUtils::BuildSphereObject3(
+					balls_name.str().c_str(),
+					Vector3(-50.0f + i * 1.25f, j*1.25f + 5.5f, 6.0f),
+					0.5f,
+					true,
+					1.0f,
+					true,
+					false,
+					colour);
+				obj->Physics()->SetFriction(0.1f);
+				obj->Physics()->SetElasticity(i * 0.1f + 0.5f);
+				this->AddGameObject(obj);
+				Object* balltower = this->FindGameObject(balls_name.str().c_str());
+				balltower->Physics()->Setstate(true);
 
-	for (int x = 0; x < 3; ++x)
-	{
-		for (int y = 0; y < 3; ++y){
-			
-			uint idx = x * 5 + y;
-			Vector4 colour = GenColour(idx / 10.f, 0.5f);
-			//Vector3 pos = Vector3(x - y * 0.5f+40.f, 0.5f + float(6 - 1 - y), -0.5f+15.f);
-			Vector3 pos = Vector3(50.0f + x * 1.25f, y*1.25f + 5.5f,  6.0f);
-			box_name << "boxname" << box_num;
-
-			
-			Object* cube = CommonUtils::BuildCuboidObject(
-				box_name.str().c_str(),
-				pos,					// Position
-				Vector3(0.5f,0.5f,0.5f),				// Half-Dimensions
-				true,
-				0.1f,
-				true,
-				false,
-				colour);
-			
-			cube->Physics()->SetFriction(1.0f);
-			//cube->Physics()->SetElasticity(0.0f);	
-			this->AddGameObject(cube);
-			Object* cubetower = this->FindGameObject(box_name.str().c_str());
-			cubetower->Physics()->Setstate(true);
-		
 			}
 		}
 
-	//big ball
-	Object* ballF=CommonUtils::BuildSphereObject(
-		"BallF",
-		ss_pos,
-		20.0f, 
-		true, 
-		0.0f, 
-		true, 
-		false,
-		Vector4(0.6f, 0.6f, 0.6f, 1.0f));
-	
+		//cube tower
+		int box_num = 0;
+
+		ostringstream box_name;
+
+		for (int x = 0; x < 3; ++x)
+		{
+			for (int y = 0; y < 3; ++y) {
+
+				uint idx = x * 5 + y;
+				Vector4 colour = GenColour(idx / 10.f, 0.5f);
+				//Vector3 pos = Vector3(x - y * 0.5f+40.f, 0.5f + float(6 - 1 - y), -0.5f+15.f);
+				Vector3 pos = Vector3(50.0f + x * 1.25f, y*1.25f + 5.5f, 6.0f);
+				box_name << "boxname" << box_num;
+
+
+				Object* cube = CommonUtils::BuildCuboidObject(
+					box_name.str().c_str(),
+					pos,					// Position
+					Vector3(0.5f, 0.5f, 0.5f),				// Half-Dimensions
+					true,
+					0.1f,
+					true,
+					false,
+					colour);
+
+				cube->Physics()->SetFriction(1.0f);
+				//cube->Physics()->SetElasticity(0.0f);	
+				this->AddGameObject(cube);
+				Object* cubetower = this->FindGameObject(box_name.str().c_str());
+				cubetower->Physics()->Setstate(true);
+
+			}
+		}
+
+		//big ball
+		Object* ballF = CommonUtils::BuildSphereObject(
+			"BallF",
+			ss_pos,
+			20.0f,
+			true,
+			0.0f,
+			true,
+			false,
+			Vector4(0.6f, 0.6f, 0.6f, 1.0f));
+
 		this->AddGameObject(ballF);
 
-	//small ball
-	Object* ballS=CommonUtils::BuildSphereObject1(
-		"BallS",
-		Vector3(20.f, 0.0f, 20.0f),
-		1.25f,
-		true,
-		1.0f,
-		true,
-		true,
-		Vector4(0.0f, 0.6f, 0.6f, 1.0f));
-		
-		this->AddGameObject(ballS);
+		//small ball
+		Object* ballS = CommonUtils::BuildSphereObject1(
+			"BallS",
+			Vector3(20.f, 0.0f, 20.0f),
+			1.25f,
+			true,
+			1.0f,
+			true,
+			true,
+			Vector4(0.0f, 0.6f, 0.6f, 1.0f));
 
+		this->AddGameObject(ballS);
+	
 
 		//DistanceConstraint* constraint = new DistanceConstraint(
 		//	ballF->Physics(),					//Physics Object A
@@ -331,7 +315,9 @@ void EmptyScene::OnInitializeScene() {
 			this->AddGameObject(obj);
 		}
 
-
+		
+		
+		
 
 }
 
@@ -400,7 +386,7 @@ void EmptyScene::OnUpdateScene(float dt) {
 	}
 	Object* target = this->FindGameObject("target");
 	
-
+	//shoot ball
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_J)) {
 		Matrix4 viewMtx = SceneManager::Instance()->GetCamera()->BuildViewMatrix();
 		Vector3 viewDir = -Vector3(viewMtx[2], viewMtx[6], viewMtx[10]);
@@ -430,6 +416,8 @@ void EmptyScene::OnUpdateScene(float dt) {
 	}
 
 
+
+	//get pionts
 	if (PhysicsEngine::Instance()->GetPoints() > 0)
 	{
 		thispoints = (int)PhysicsEngine::Instance()->GetPoints();
@@ -444,7 +432,7 @@ void EmptyScene::OnUpdateScene(float dt) {
 		thispoints = 0;
 		
 	}
-
+	//reset points
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_0)) {
 		
 		/*savescore.push_back(totalpoints);*/
@@ -453,6 +441,8 @@ void EmptyScene::OnUpdateScene(float dt) {
 		totalpoints = 0;
 
 	}
+
+	//send player points to server
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_9)) {
 		
 		ostringstream f;
@@ -462,6 +452,8 @@ void EmptyScene::OnUpdateScene(float dt) {
 
 		enet_peer_send(m_pServerConnection, 0, packet);
 	}
+
+
 	NCLDebug::AddStatusEntry(status_colour, "Plz press 9 button to send your total to server");
 	NCLDebug::AddStatusEntry(status_colour, "Plz press 0 button to reset your score");
 	NCLDebug::AddStatusEntry(status_colour, "This  Score is: %d", thispoints);
@@ -472,12 +464,73 @@ void EmptyScene::OnUpdateScene(float dt) {
 	
 	
 	
-
 	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "Physics:");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "     Draw Collision Volumes /Normals(Press M to toggle)" );
+
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_M))
+	{
+		DrawModeChanged = true;
+
+		drawMode++;
+
+		if (drawMode >=2) drawMode = 0;
+	}
+
+
+	switch (drawMode)
+	{
+	case 0:
+	{
+		if (DrawModeChanged)
+		{
+			uint drawFlags = PhysicsEngine::Instance()->GetDebugDrawFlags();
+
+			drawFlags ^= DEBUGDRAW_FLAGS_COLLISIONVOLUMES;
+
+			drawFlags ^= DEBUGDRAW_FLAGS_COLLISIONNORMALS;
+
+			PhysicsEngine::Instance()->SetDebugDrawFlags(drawFlags);
+
+			PhysicsEngine::Instance()->SetVisableState(!PhysicsEngine::Instance()->IsVisableState());
+
+			DrawModeChanged = false;
+		}
+
+		break;
+	}
+	case 1:
+	{
+		if (DrawModeChanged)
+		{
+			uint drawFlags = PhysicsEngine::Instance()->GetDebugDrawFlags();
+
+			drawFlags ^= DEBUGDRAW_FLAGS_COLLISIONVOLUMES;
+
+			drawFlags ^= DEBUGDRAW_FLAGS_COLLISIONNORMALS;
+
+			PhysicsEngine::Instance()->SetDebugDrawFlags(drawFlags);
+
+			DrawModeChanged = false;
+		}
+
+		break;
+	}
+	case 2:
+	{
+		if (DrawModeChanged)
+		{
+			PhysicsEngine::Instance()->SetVisableState(!PhysicsEngine::Instance()->IsVisableState());
+
+			DrawModeChanged = false;
+		}
+		break;
+	}
+
+}
+	/*NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "Physics:");
 	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "     (Arrow Keys to Move Player)");
 	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "     Draw Collision Volumes : %s (Press C to toggle)", (drawFlags & DEBUGDRAW_FLAGS_COLLISIONVOLUMES) ? "Enabled" : "Disabled");
 	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "     Draw Collision Normals : %s (Press N to toggle)", (drawFlags & DEBUGDRAW_FLAGS_COLLISIONNORMALS) ? "Enabled" : "Disabled");
-
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_C))
 		drawFlags ^= DEBUGDRAW_FLAGS_COLLISIONVOLUMES;
 
@@ -485,7 +538,7 @@ void EmptyScene::OnUpdateScene(float dt) {
 		drawFlags ^= DEBUGDRAW_FLAGS_COLLISIONNORMALS;
 
 	PhysicsEngine::Instance()->SetDebugDrawFlags(drawFlags);
-
+*/
 	
 	//Update Network
 	auto callback = std::bind(
@@ -529,6 +582,7 @@ void EmptyScene::OnUpdateScene(float dt) {
 
 		enet_peer_send(m_pServerConnection, 0, packet);
 	}*/
+	
 	
 }
 

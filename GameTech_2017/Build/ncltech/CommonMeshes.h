@@ -44,7 +44,9 @@ public:
 
 	//PhysicsEngine Checkerboard - Hidden here for reasons of laziness
 	static GLuint CheckerboardTex() { return m_CheckerboardTex; }
-	
+
+	static GLuint CheckerboardTex1() { return m_CheckerboardTex1; }
+
 	static GLuint CheckerboardTexball() { return m_CheckerboardTexball; }
 	
 	static GLuint CheckerboardTexballshoot() { return m_CheckerboardTexballshoot; }
@@ -58,15 +60,18 @@ protected:
 protected:
 	static Mesh* m_pCube;
 	static Mesh*m_pCube_groud;
-	static Mesh* m_pSphere;
 
+	static Mesh* m_pSphere;
 	static Mesh* m_pSphereball;
 	static Mesh* m_pSphereballshoot;
+	static Mesh* m_pSphereballtower;
 
 	static Mesh* m_pPlane;
 
 
 	static GLuint m_CheckerboardTex;
+	static GLuint m_CheckerboardTex1;
+
 	static GLuint m_CheckerboardTexball;
 	static GLuint m_CheckerboardTexballshoot;
 	static GLuint m_groud;

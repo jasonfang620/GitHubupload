@@ -56,6 +56,8 @@ public:
 	inline bool					Gettarget()					const	{ return m_target; }
 	inline bool					Getbullet()					const	{ return m_bullet; }
 	inline bool					Getaddpoints()				const	{ return m_addpoints; }
+	inline bool					GetInatomsphere()			const	{ return m_Inatmosphere; }
+	
 
 	inline float				GetElasticity()				const 	{ return m_Elasticity; }
 	inline float				GetFriction()				const 	{ return m_Friction; }
@@ -85,6 +87,7 @@ public:
 	inline void Setcollition(bool a) { m_colltion = a; }		//set collision or not
 	inline void	Settarget(bool a ) { m_target=a; }				//set which is target or not
 	inline void Setbullet(bool a) { m_bullet = a; }				//set which is bullet or not
+	inline void SetInatomsphere(bool a) { m_Inatmosphere = a; }	//set truly into atomsphere
 
 	inline void SetElasticity(float elasticity)						{ m_Elasticity = elasticity; }
 	inline void SetFriction(float friction)							{ m_Friction = friction; }
@@ -123,6 +126,7 @@ protected:
 	bool				m_target;
 	bool				m_bullet;
 	bool				m_addpoints;
+	bool				m_Inatmosphere;
 
 	mutable bool		m_wsTransformInvalidated;
 	mutable Matrix4		m_wsTransform;

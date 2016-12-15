@@ -14,6 +14,8 @@ void PhysicsEngine::SetDefaults()
 	m_UpdateAccum = 0.0f;
 	m_Gravity = Vector3(0.0f, -9.81f, 0.0f);
 	m_DampingFactor = 0.999f;
+	m_atmosphere = false;
+	m_IsVisableState = false;
 }
 
 PhysicsEngine::PhysicsEngine()
@@ -190,6 +192,45 @@ void PhysicsEngine::UpdatePhysicsObject(PhysicsObject* obj)
 		obj->m_LinearVelocity  = Vector3(0.0f, 0.0f, 0.0f);
 		obj->m_AngularVelocity = Vector3(0.0f, 0.0f, 0.0f);
 	}		//judge state 
+
+
+	SetDampingFactor(0.999f);
+	Vector4 Col = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	Vector4 Colin = Vector4(1.0f, 0.f, 0.5f, 1.f);
+	
+	if (IsAtmosphere()) {
+		float distoplanet = (obj->GetPosition() - Vector3(0, 0, 0)).LengthSquared();
+
+		if (distoplanet <= 40.f * 40.f) {
+			obj->SetInatomsphere(true);
+		}
+		else {
+			obj->SetInatomsphere(false);
+		}
+		if (obj->GetInatomsphere()) {
+			SetDampingFactor(0.9f);
+			if (obj->Getbullet()) {
+				obj->GetAssociatedObject()->SetColour(Colin);
+			}
+			if (obj->Gettarget()) {
+				obj->GetAssociatedObject()->SetColour(Vector4(0.2f, 0.5f, 1.0f, 1.0f));
+			}
+			else {
+				obj->GetAssociatedObject()->SetColour(Col);
+			}
+		}
+	}
+	if (!IsVisableState()) {
+		Vector4 setCol = obj->m_pParent->GetColour();
+		if(setCol.w!=0.f)
+		obj->GetAssociatedObject()->SetColour(Vector4(setCol.x, setCol.y, setCol.z, 0.f));
+		
+	}
+	else {
+		Vector4 setCol = obj->m_pParent->GetColour();
+		obj->GetAssociatedObject()->SetColour(Vector4(setCol.x, setCol.y, setCol.z, 1.f));
+	}
+
 	//save v of t+0.5 v(add cord for fang)
 	Vector3 m_tempVecelocity;
 	m_tempVecelocity = obj->m_LinearVelocity;
